@@ -77,7 +77,7 @@ const Cars = () => {
             onClick={() => {
               setShowTable(!showTable);
             }}
-            className="font-bold text-xl bg-gradient-to-r text-gray-800 border-2 border-yellow-500  py-2 px-4 shadow rounded hover:from-yellow-400 hover:via-yellow-500 hover:to-yellow-600 hover:text-gray-100"
+            className="font-bold text-xl bg-gradient-to-r text-gray-800 border border-yellow-500  py-2 px-4 shadow rounded hover:from-yellow-400 hover:via-yellow-500 hover:to-yellow-600 hover:text-gray-100"
           >
             {buttonText}
           </button>
