@@ -1,3 +1,24 @@
-td{
-    padding: 0.4rem 0.2rem;
+input{
+    background: transparent;
+    color: gray;
+}
+
+
+.cars-table td, .cars-table th{
+    padding: 0.5rem;
+    }
+
+.cars-table th{
+    background-color: #fbbe24c2;
+}
+
+.cars-table tr:nth-child(odd){
+    background-color: rgba(100, 100, 100, 0.8);
+}
+.cars-table tr:nth-child(even){
+    background-color: rgba(50, 50, 50, 0.8);
+}
+
+.cars-table tr:hover, .cars-table{
+    background-color: #fbbe249d;
 }
