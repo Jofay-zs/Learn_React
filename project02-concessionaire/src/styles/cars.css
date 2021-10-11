@@ -3,10 +3,9 @@ input{
     color: gray;
 }
 
-
 .cars-table td, .cars-table th{
     padding: 0.5rem;
-    }
+}
 
 .cars-table th{
     background-color: #fbbe24c2;

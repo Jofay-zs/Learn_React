@@ -9,10 +9,10 @@ const PrivateLayout = ({ children }) => {
   const {darkMode} = useDarkMode();
 
   return (
-    <div className="w-screen h-auto sm:h-screen flex flex-col">
+    <div className="w-screen  h-auto sm:h-screen flex flex-col">
       <ResponsiveNavbar />
       {showNavbar ? <Sidebar /> : <div />}
-      <div className="flex flex-nowrap h-full w-full">
+      <div className="flex flex-nowrap h-full w-full ">
         <div className="absolute top-4 right-10">
           <button
             className="text-2xl hover:text-gray-700"

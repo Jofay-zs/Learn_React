@@ -4,6 +4,7 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useDarkMode } from "context/darkMode";
 import { nanoid } from "nanoid";
+import { Dialog, Tooltip } from "@mui/material";
 
 // Make a form that asks the user for the age and displays a message that says if the user is older or not
 
@@ -141,25 +142,29 @@ const TableItem = ({ elementToEdit, elementToSet, currentItem }) => {
             type="text"
             className="w-full outline-none border border-gray-800 px-2 py-1 text-gray-800"
             defaultValue={item}
-            onChange = {(e)=>{
+            onChange={(e) => {
               temporal = e.target.value;
             }}
           />
-          <button type='submit'>
+          <button type="submit">
+            <Tooltip title="Confirm" arrow>
+              <i
+                className="fas fa-check text-gray-800 mx-1 cursor-pointer text-xl hover:text-green-500"
+                onClick={() => {
+                  setItem(temporal);
+                  set(!edit);
+                }}
+              ></i>
+            </Tooltip>
+          </button>
+          <Tooltip title="Cancel" arrow>
             <i
-              className="fas fa-check text-gray-800 mx-1 cursor-pointer text-xl hover:text-green-500"
+              className="fas fa-times text-gray-800 mx-1 cursor-pointer text-xl hover:text-red-500"
               onClick={() => {
-                setItem(temporal);
                 set(!edit);
               }}
             ></i>
-          </button>
-          <i
-            className="fas fa-times text-gray-800 mx-1 cursor-pointer text-xl hover:text-red-500"
-            onClick={() => {
-              set(!edit);
-            }}
-          ></i>
+          </Tooltip>
         </div>
       ) : (
         <div
@@ -181,6 +186,15 @@ const VehicleRow = ({ vehicle }) => {
   const [editModel, setEditModel] = useState(false);
   const [editColor, setEditColor] = useState(false);
   const [editOwner, setEditOwner] = useState(false);
+
+  const [openDialog, setOpenDialog] = useState(false);
+
+  const deleteVehicle = () => {
+    console.log(
+      "Falta esta funcionalidad, pero la hago cuando conecte con el back"
+    );
+  };
+
   return (
     // nanoid is a tool that guarantees that every element will have an unique ID.
     <tr>
@@ -215,27 +229,68 @@ const VehicleRow = ({ vehicle }) => {
         elementToSet={setEditOwner}
         currentItem={vehicle.owner}
       />
+      <Tooltip title="Delete" arrow>
+        <td>
+          <div className="flex items-center justify-center m-0 p-0 ">
+            <i
+              className="fas fa-trash mx-1 cursor-pointer hover:text-red-500"
+              onClick={() => setOpenDialog(true)}
+            ></i>
+          </div>
+        </td>
+      </Tooltip>
+      <Dialog open={openDialog}>
+        <div className=" flex-col bg-gray-500 text-gray-100 p-5">
+          <h3 className="mb-5 text-xl">Are you sure to remove the vehicle ?</h3>
+          <div className="flex justify-between">
+            <button
+              onClick={() => {
+                deleteVehicle();
+                setOpenDialog(false);
+              }}
+              className="text-md border border-gray-100 px-2 py-1 hover:bg-green-700 w-full mr-1"
+            >
+              Yes
+            </button>
+            <button
+              onClick={() => {
+                setOpenDialog(false);
+              }}
+              className="text-md border border-gray-100 px-2 py-1 hover:bg-red-700 w-full ml-1"
+            >
+              No
+            </button>
+          </div>
+        </div>
+      </Dialog>
     </tr>
   );
 };
 
 const CarsTable = ({ vehiclesList }) => {
-  // useEffect(() => {
-  //   console.log("Cars List:", vehiclesList);
-  // }, [vehiclesList]);
-
   const { darkMode } = useDarkMode();
 
   const form = useRef(null);
-  
-    // const submitEditTableCars = (e) => {
-    //   e.preventDefault();
-    //   const fd = new FormData(form.current);
-    //   console.log(e);
-    // }
+
+  // const submitEditTableCars = (e) => {
+  //   e.preventDefault();
+  //   const fd = new FormData(form.current);
+  //   console.log(e);
+  // }
+
+  const [search, setSearch] = useState("");
+  const [filteredVehicles, setFilteredVehicles] = useState(vehiclesList);
+
+  useEffect(() => {
+    setFilteredVehicles(
+      vehiclesList.filter((e) => {
+        return JSON.stringify(e).toLowerCase().includes(search.toLowerCase());
+      })
+    );
+  }, [search, vehiclesList]);
 
   return (
-    <div className="flex flex-col justify-center items-center w-screen px-10 h-full">
+    <div className="flex flex-col items-center w-screen px-10 h-auto sm:h-full">
       <h2
         className={`text-2xl font-bold  mb-5 ${
           darkMode ? "text-gray-100" : "text-gray-800"
@@ -243,25 +298,54 @@ const CarsTable = ({ vehiclesList }) => {
       >
         Look at all the vehicles
       </h2>
+      <div className="flex justify-start w-full items-center">
+        <input
+          value={search}
+          onChange={(e) => {
+            setSearch(e.target.value);
+          }}
+          type="text"
+          placeholder={"Search"}
+          className="w-auto my-2 bg-gray-100 border border-gray-400 rounded-lg outline-none focus:border-yellow-500 py-2 px-4"
+        />
+        <i className="fas fa-search ml-2 text-xl"></i>
+      </div>
       {/* //onSubmit={submitEditTableCars} */}
       <form ref={form} className="w-full">
-        <table className="cars-table w-full">
-          <thead className="text-xl font-bold">
-            <tr>
-              <th>ID</th>
-              <th>Name</th>
-              <th>Brand</th>
-              <th>Model</th>
-              <th>Color</th>
-              <th>Owner</th>
-            </tr>
-          </thead>
-          <tbody>
-            {vehiclesList.map((vehicle) => {
-              return <VehicleRow key={nanoid()} vehicle={vehicle} />;
-            })}
-          </tbody>
-        </table>
+        <div className='hidden sm:block'>
+          <table className="cars-table w-full">
+            <thead className="text-xl font-bold">
+              <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Brand</th>
+                <th>Model</th>
+                <th>Color</th>
+                <th>Owner</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredVehicles.map((vehicle) => {
+                return <VehicleRow key={nanoid()} vehicle={vehicle} />;
+              })}
+            </tbody>
+          </table>
+        </div>
+        <div className='flex flex-col sm:hidden'>
+          {filteredVehicles.map((e) => {
+            return (
+              <div className='w-full bg-gray-500 rounded-xl p-5 my-2 flex flex-col shadow'>
+                <span>{e.ID}</span>
+                <span>{e.name}</span>
+                <span>{e.brand}</span>
+                <span>{e.model}</span>
+                <span>{e.color}</span>
+                <span>{e.owner}</span>
+              </div>
+            );
+          })}
+        </div>
       </form>
     </div>
   );
@@ -269,7 +353,6 @@ const CarsTable = ({ vehiclesList }) => {
 
 const CarsForm = ({ setShowTable, vehiclesList, addVehicle }) => {
   const form = useRef(null);
-
 
   const submitForm = (e) => {
     e.preventDefault();
