@@ -2,16 +2,9 @@ import Express, { response } from "express";
 import { MongoClient, ObjectId } from "mongodb";
 import Cors from "cors";
 import dotenv from 'dotenv';
+import {conectDB, getConection} from './db/db.js';
 
 dotenv.config({path:'./.env'});
-const stringConection = process.env.DATABASE_URL;
-
-const client = new MongoClient(stringConection, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-});
-
-let conection;
 
 const app = Express();
 
@@ -30,6 +23,7 @@ app.post("/cars/new", (req, res) => {
       Object.keys(vehiclesData).includes("color") &&
       Object.keys(vehiclesData).includes("owner")
     ) {
+      const conection = getConection();
       conection
         .collection("vehicles")
         .insertOne(vehiclesData, (err, result) => {
@@ -51,6 +45,7 @@ app.post("/cars/new", (req, res) => {
 
 app.get("/cars", (req, res) => {
   console.log("Someone did get on the route /cars");
+  const conection = getConection();
   conection
     .collection("vehicles")
     .find()
@@ -71,6 +66,7 @@ app.patch("/cars/edit", (req, res) => {
   const atomicOperation = {
     $set: vehicleToEdit,
   };
+  const conection = getConection();
   conection
     .collection("vehicles")
     .findOneAndUpdate(
@@ -92,6 +88,7 @@ app.patch("/cars/edit", (req, res) => {
 app.delete("/cars/delete", (req, res) => {
   const vehicleToEdit = req.body;
   const filterVehicle = { _id: new ObjectId(vehicleToEdit.id) };
+  const conection = getConection();
   conection.collection("vehicles").deleteOne(filterVehicle, (error, result) => {
     if (error) {
       console.log('Error deleting vehicle: ',error)
@@ -104,15 +101,9 @@ app.delete("/cars/delete", (req, res) => {
 });
 
 const main = () => {
-  client.connect((err, db) => {
-    if (err) {
-      console.error("Error conecting DB");
-    }
-    conection = db.db("concessionaire");
-    console.log("Successfull conection");
-    return app.listen(process.env.PORT, () => {
-      console.log("Listen port", process.env.PORT);
-    });
+  return app.listen(process.env.PORT, () => {
+    console.log("Listen port", process.env.PORT);
   });
 };
-main();
+
+conectDB(main);
