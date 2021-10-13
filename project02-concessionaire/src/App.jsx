@@ -1,5 +1,5 @@
 import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import "styles/styles.css";
 import Login from "pages/Login";
 import Signup from "pages/Signup";
@@ -15,9 +15,9 @@ import { DarkModeContext } from "context/darkMode";
 function App() {
   const [darkMode, setDarkMode] = useState(false);
 
-  useEffect(() => {
-    console.log('dark mode:',darkMode);
-  }, [darkMode])
+  // useEffect(() => {
+  //   console.log('dark mode:',darkMode);
+  // }, [darkMode])
 
   return (
     <DarkModeContext.Provider value={{darkMode, setDarkMode}}>

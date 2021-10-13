@@ -1,13 +1,12 @@
 import React from "react";
-import { Link, useLocation } from "react-router-dom";
-import { useEffect } from "react";
+import { Link } from "react-router-dom";
 
 const Sidebar = () => {
-  const location = useLocation();
+  // const location = useLocation();
 
-  useEffect(() => {
-    console.log(location);
-  }, [location])
+  // useEffect(() => {
+  //   console.log(location);
+  // }, [location])
 
   return (
     <nav className="fixed top-0 right-0 h-screen w-screen sm:w-1/2 lg:w-1/4 bg-gradient-to-b from-yellow-300 via-yellow-500 to-yellow-700 shadow">

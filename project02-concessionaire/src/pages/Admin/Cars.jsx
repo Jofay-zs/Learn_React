@@ -5,51 +5,9 @@ import "react-toastify/dist/ReactToastify.css";
 import { useDarkMode } from "context/darkMode";
 import { nanoid } from "nanoid";
 import { Dialog, Tooltip } from "@mui/material";
+import axios from "axios";
 
 // Make a form that asks the user for the age and displays a message that says if the user is older or not
-
-const backendVehicles = [
-  {
-    ID: "01",
-    name: "Tesla X",
-    brand: "Tesla",
-    model: 2020,
-    color: "Black",
-    owner: "Will",
-  },
-  {
-    ID: "02",
-    name: "Toyota 4 Runner",
-    brand: "Toyota",
-    model: 2019,
-    color: "Blue",
-    owner: "Juan",
-  },
-  {
-    ID: "03",
-    name: "Mazda 3",
-    brand: "Mazda",
-    model: 2017,
-    color: "Orange",
-    owner: "Daniel",
-  },
-  {
-    ID: "04",
-    name: "Volkswagen Tiguan",
-    brand: "Volkswagen",
-    model: 2018,
-    color: "Green",
-    owner: "Anie",
-  },
-  {
-    ID: "05",
-    name: "Chevrolet Onix",
-    brand: "Chevrolet",
-    model: "2018",
-    color: "Yellow",
-    owner: "Mary",
-  },
-];
 
 const Cars = () => {
   const [showTable, setShowTable] = useState(false);
@@ -58,11 +16,48 @@ const Cars = () => {
 
   const [vehicles, setVehicles] = useState([]);
 
+  const [runQuery, setRunQuery] = useState(true);
+
   const { darkMode } = useDarkMode();
+
+  useEffect(() => {
+    const obtainVehicles = async () => {
+      var config = {
+        method: "GET",
+        url: "http://localhost:5000/cars",
+        headers: {},
+      };
+
+      await axios(config)
+        .then(function (response) {
+          // console.log(JSON.stringify(response.data));
+          setVehicles(response.data);
+        })
+        .catch(function (error) {
+          console.log(error);
+          toast.error("Error getting data 😢", {
+            position: "top-right",
+            autoClose: 3000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+          });
+        });
+    };
+    if(runQuery){
+      obtainVehicles();
+      setRunQuery(false);
+    }
+  }, [runQuery]);
+
   useEffect(() => {
     // Geeting vehicles list from the Frontend
-    setVehicles(backendVehicles);
-  }, []);
+    if (showTable) {
+      setRunQuery(true);
+    }
+  }, [showTable]);
 
   useEffect(() => {
     /**
@@ -104,7 +99,7 @@ const Cars = () => {
         </div>
       </div>
       {showTable ? (
-        <CarsTable vehiclesList={vehicles} />
+        <CarsTable vehiclesList={vehicles} setRunQuery={setRunQuery}/>
       ) : (
         <CarsForm
           setShowTable={setShowTable}
@@ -114,7 +109,7 @@ const Cars = () => {
       )}
       <ToastContainer
         position="top-right"
-        autoClose={5000}
+        autoClose={3000}
         hideProgressBar={false}
         newestOnTop={false}
         closeOnClick
@@ -127,12 +122,86 @@ const Cars = () => {
   );
 };
 
-const TableItem = ({ elementToEdit, elementToSet, currentItem }) => {
-  const [item, setItem] = useState(currentItem);
+const TableItem = ({
+  elementToEdit,
+  elementToSet,
+  currentItem,
+  vehicle,
+  importantDecision,
+  setRunQuery,
+}) => {
+  const [item] = useState(currentItem);
   const edit = elementToEdit;
   const set = elementToSet;
 
   var [temporal] = useState(item);
+
+  const updateVehicle = async () => {
+    let data;
+
+    if (importantDecision === "name") {
+      data = JSON.stringify({
+        id: vehicle._id,
+        name: temporal,
+      });
+    } else if (importantDecision === "brand") {
+      data = JSON.stringify({
+        id: vehicle._id,
+        brand: temporal,
+      });
+    } else if (importantDecision === "model") {
+      data = JSON.stringify({
+        id: vehicle._id,
+        model: temporal,
+      });
+    } else if (importantDecision === "color") {
+      data = JSON.stringify({
+        id: vehicle._id,
+        color: temporal,
+      });
+    } else if (importantDecision === "owner") {
+      data = JSON.stringify({
+        id: vehicle._id,
+        owner: temporal,
+      });
+    }
+
+    var config = {
+      method: "PATCH",
+      url: "http://localhost:5000/cars/edit",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      data: data,
+    };
+
+    await axios(config)
+      .then(function (response) {
+        // console.log(JSON.stringify(response.data));
+        toast.success("Successfully updated vehicle 🚀", {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+        });
+        setRunQuery(true);
+      })
+      .catch(function (error) {
+        console.log(error);
+        toast.error("Error updating vehicle 😢", {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+        });
+      });
+  };
 
   return (
     <td>
@@ -151,8 +220,8 @@ const TableItem = ({ elementToEdit, elementToSet, currentItem }) => {
               <i
                 className="fas fa-check text-gray-800 mx-1 cursor-pointer text-xl hover:text-green-500"
                 onClick={() => {
-                  setItem(temporal);
                   set(!edit);
+                  updateVehicle();
                 }}
               ></i>
             </Tooltip>
@@ -180,7 +249,7 @@ const TableItem = ({ elementToEdit, elementToSet, currentItem }) => {
   );
 };
 
-const VehicleRow = ({ vehicle }) => {
+const VehicleRow = ({ vehicle, setRunQuery }) => {
   const [editName, setEditName] = useState(false);
   const [editBrand, setEditBrand] = useState(false);
   const [editModel, setEditModel] = useState(false);
@@ -189,45 +258,91 @@ const VehicleRow = ({ vehicle }) => {
 
   const [openDialog, setOpenDialog] = useState(false);
 
-  const deleteVehicle = () => {
-    console.log(
-      "Falta esta funcionalidad, pero la hago cuando conecte con el back"
-    );
+  const deleteVehicle = async () => {
+    var data = JSON.stringify({
+      id: vehicle._id,
+    });
+
+    var config = {
+      method: "DELETE",
+      url: "http://localhost:5000/cars/delete",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      data: data,
+    };
+
+    await axios(config)
+      .then(function (response) {
+        // console.log(JSON.stringify(response.data));
+        toast.success("Successfully deleted vehicle 🚔", {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+        });
+        setRunQuery(true);
+      })
+      .catch(function (error) {
+        console.log(error);
+        toast.error("Error deleting vehicle 😢", {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+        });
+      });
   };
 
   return (
     // nanoid is a tool that guarantees that every element will have an unique ID.
     <tr>
-      <td>{vehicle.ID}</td>
+      <td>{vehicle._id.slice(18)}</td>
       <TableItem
         vehicle={vehicle}
         elementToEdit={editName}
         elementToSet={setEditName}
         currentItem={vehicle.name}
+        importantDecision={"name"}
+        setRunQuery = {setRunQuery}
       />
       <TableItem
         vehicle={vehicle}
         elementToEdit={editBrand}
         elementToSet={setEditBrand}
         currentItem={vehicle.brand}
+        importantDecision={"brand"}
+        setRunQuery = {setRunQuery}
       />
       <TableItem
         vehicle={vehicle}
         elementToEdit={editModel}
         elementToSet={setEditModel}
         currentItem={vehicle.model}
+        importantDecision={"model"}
+        setRunQuery = {setRunQuery}
       />
       <TableItem
         vehicle={vehicle}
         elementToEdit={editColor}
         elementToSet={setEditColor}
         currentItem={vehicle.color}
+        importantDecision={"color"}
+        setRunQuery = {setRunQuery}
       />
       <TableItem
         vehicle={vehicle}
         elementToEdit={editOwner}
         elementToSet={setEditOwner}
         currentItem={vehicle.owner}
+        importantDecision={"owner"}
+        setRunQuery = {setRunQuery}
       />
       <Tooltip title="Delete" arrow>
         <td>
@@ -267,7 +382,7 @@ const VehicleRow = ({ vehicle }) => {
   );
 };
 
-const CarsTable = ({ vehiclesList }) => {
+const CarsTable = ({ vehiclesList, setRunQuery }) => {
   const { darkMode } = useDarkMode();
 
   const form = useRef(null);
@@ -312,7 +427,7 @@ const CarsTable = ({ vehiclesList }) => {
       </div>
       {/* //onSubmit={submitEditTableCars} */}
       <form ref={form} className="w-full">
-        <div className='hidden sm:block'>
+        <div className="hidden sm:block max-h-96 overflow-y-auto">
           <table className="cars-table w-full">
             <thead className="text-xl font-bold">
               <tr>
@@ -327,16 +442,22 @@ const CarsTable = ({ vehiclesList }) => {
             </thead>
             <tbody>
               {filteredVehicles.map((vehicle) => {
-                return <VehicleRow key={nanoid()} vehicle={vehicle} />;
+                return (
+                  <VehicleRow
+                    key={nanoid()}
+                    vehicle={vehicle}
+                    setRunQuery={setRunQuery}
+                  />
+                );
               })}
             </tbody>
           </table>
         </div>
-        <div className='flex flex-col sm:hidden'>
+        <div className="flex flex-col sm:hidden">
           {filteredVehicles.map((e) => {
             return (
-              <div className='w-full bg-gray-500 rounded-xl p-5 my-2 flex flex-col shadow'>
-                <span>{e.ID}</span>
+              <div className="w-full bg-gray-500 rounded-xl p-5 my-2 flex flex-col shadow">
+                <span>{e._id.slice(18)}</span>
                 <span>{e.name}</span>
                 <span>{e.brand}</span>
                 <span>{e.model}</span>
@@ -354,7 +475,7 @@ const CarsTable = ({ vehiclesList }) => {
 const CarsForm = ({ setShowTable, vehiclesList, addVehicle }) => {
   const form = useRef(null);
 
-  const submitForm = (e) => {
+  const submitForm = async (e) => {
     e.preventDefault();
     const formData = new FormData(form.current);
     const newVehicle = {};
@@ -363,20 +484,53 @@ const CarsForm = ({ setShowTable, vehiclesList, addVehicle }) => {
       newVehicle[key] = value;
     });
 
+    var data = JSON.stringify({
+      // _id: newVehicle._id,
+      name: newVehicle.name,
+      brand: newVehicle.brand,
+      model: newVehicle.model,
+      color: newVehicle.color,
+      owner: newVehicle.owner,
+    });
+
+    var config = {
+      method: "POST",
+      url: "http://localhost:5000/cars/new",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      data: data,
+    };
+
+    await axios(config)
+      .then(function (response) {
+        // console.log(JSON.stringify(response.data));
+        toast.success("Successfully added vehicle 🦼", {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+        });
+      })
+      .catch(function (error) {
+        console.log(error);
+        toast.error("Error adding vehicle 😢", {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+        });
+      });
+
     setShowTable(true);
 
-    addVehicle([...vehiclesList, newVehicle]);
-
-    toast.success("Vehicle added successfully 🦼", {
-      position: "top-right",
-      autoClose: 5000,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-      progress: undefined,
-    });
-    // Falta crear el caso y mensaje de error
+    // addVehicle([...vehiclesList, newVehicle]);
   };
 
   return (
@@ -390,17 +544,6 @@ const CarsForm = ({ setShowTable, vehiclesList, addVehicle }) => {
           onSubmit={submitForm}
           className="block w-screen py-5 px-7 sm:grid sm:grid-cols-2 sm:gap-5 sm:px-20 lg:px-52 xl:px-72 2xl:px-96"
         >
-          <label className="font-bold" htmlFor="ID">
-            ID
-            <input
-              className="w-full mb-2 bg-gray-100 border border-gray-400 rounded-lg outline-none focus:border-yellow-500 py-2 px-4"
-              type="number"
-              placeholder="0001"
-              name="ID"
-              min="1"
-              required
-            />
-          </label>
           <label className="font-bold" htmlFor="name">
             Name
             <input
