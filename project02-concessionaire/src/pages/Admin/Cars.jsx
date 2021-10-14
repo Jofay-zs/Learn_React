@@ -141,34 +141,29 @@ const TableItem = ({
 
     if (importantDecision === "name") {
       data = JSON.stringify({
-        id: vehicle._id,
         name: temporal,
       });
     } else if (importantDecision === "brand") {
       data = JSON.stringify({
-        id: vehicle._id,
         brand: temporal,
       });
     } else if (importantDecision === "model") {
       data = JSON.stringify({
-        id: vehicle._id,
         model: temporal,
       });
     } else if (importantDecision === "color") {
       data = JSON.stringify({
-        id: vehicle._id,
         color: temporal,
       });
     } else if (importantDecision === "owner") {
       data = JSON.stringify({
-        id: vehicle._id,
         owner: temporal,
       });
     }
 
     var config = {
       method: "PATCH",
-      url: "http://localhost:5000/cars/edit",
+      url: `http://localhost:5000/cars/${vehicle._id}/`,
       headers: {
         "Content-Type": "application/json",
       },
@@ -259,17 +254,12 @@ const VehicleRow = ({ vehicle, setRunQuery }) => {
   const [openDialog, setOpenDialog] = useState(false);
 
   const deleteVehicle = async () => {
-    var data = JSON.stringify({
-      id: vehicle._id,
-    });
-
     var config = {
       method: "DELETE",
-      url: "http://localhost:5000/cars/delete",
+      url: `http://localhost:5000/cars/${vehicle._id}/`,
       headers: {
         "Content-Type": "application/json",
       },
-      data: data,
     };
 
     await axios(config)
@@ -303,7 +293,7 @@ const VehicleRow = ({ vehicle, setRunQuery }) => {
   return (
     // nanoid is a tool that guarantees that every element will have an unique ID.
     <tr>
-      <td>{vehicle._id.slice(18)}</td>
+      <td>{vehicle._id.slice(10)}</td>
       <TableItem
         vehicle={vehicle}
         elementToEdit={editName}
@@ -495,7 +485,7 @@ const CarsForm = ({ setShowTable, vehiclesList, addVehicle }) => {
 
     var config = {
       method: "POST",
-      url: "http://localhost:5000/cars/new",
+      url: "http://localhost:5000/cars/",
       headers: {
         "Content-Type": "application/json",
       },
