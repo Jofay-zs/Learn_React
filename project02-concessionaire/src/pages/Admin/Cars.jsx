@@ -5,36 +5,34 @@ import "react-toastify/dist/ReactToastify.css";
 import { useDarkMode } from "context/darkMode";
 import { nanoid } from "nanoid";
 import { Dialog, Tooltip } from "@mui/material";
-import axios from "axios";
-
-// Make a form that asks the user for the age and displays a message that says if the user is older or not
+import {
+  getVehiclesApi,
+  createVehicleApi,
+  editVehicleApi,
+  deleteVehicleApi,
+} from "utils/api";
 
 const Cars = () => {
   const [showTable, setShowTable] = useState(false);
   const [buttonText, setButtonText] = useState("Create new car");
   const [changeButtonColor, setChangeButtonColor] = useState("indigo");
-
   const [vehicles, setVehicles] = useState([]);
-
   const [runQuery, setRunQuery] = useState(true);
-
   const { darkMode } = useDarkMode();
 
   useEffect(() => {
-    const obtainVehicles = async () => {
-      var config = {
-        method: "GET",
-        url: "http://localhost:5000/cars",
-        headers: {},
-      };
-
-      await axios(config)
-        .then(function (response) {
-          // console.log(JSON.stringify(response.data));
+    console.log("Query:", runQuery);
+    if (runQuery) {
+      getVehiclesApi(
+        (response) => {
+          console.log(
+            "The response received was:",
+            JSON.stringify(response.data)
+          );
           setVehicles(response.data);
-        })
-        .catch(function (error) {
-          console.log(error);
+        },
+        (error) => {
+          console.error("There is an error:", error);
           toast.error("Error getting data 😢", {
             position: "top-right",
             autoClose: 3000,
@@ -44,11 +42,13 @@ const Cars = () => {
             draggable: true,
             progress: undefined,
           });
-        });
-    };
-    if(runQuery){
-      obtainVehicles();
+        }
+      );
       setRunQuery(false);
+      //   if (runQuery) {
+      //     obtainVehicles(setVehicles);
+      //     setRunQuery(false);
+      //   }
     }
   }, [runQuery]);
 
@@ -99,7 +99,7 @@ const Cars = () => {
         </div>
       </div>
       {showTable ? (
-        <CarsTable vehiclesList={vehicles} setRunQuery={setRunQuery}/>
+        <CarsTable vehiclesList={vehicles} setRunQuery={setRunQuery} />
       ) : (
         <CarsForm
           setShowTable={setShowTable}
@@ -138,7 +138,6 @@ const TableItem = ({
 
   const updateVehicle = async () => {
     let data;
-
     if (importantDecision === "name") {
       data = JSON.stringify({
         name: temporal,
@@ -155,25 +154,18 @@ const TableItem = ({
       data = JSON.stringify({
         color: temporal,
       });
-    } else if (importantDecision === "owner") {
+    } else if (importantDecision === "price") {
       data = JSON.stringify({
-        owner: temporal,
+        price: temporal,
       });
     }
 
-    var config = {
-      method: "PATCH",
-      url: `http://localhost:5000/cars/${vehicle._id}/`,
-      headers: {
-        "Content-Type": "application/json",
-      },
-      data: data,
-    };
-
-    await axios(config)
-      .then(function (response) {
-        // console.log(JSON.stringify(response.data));
-        toast.success("Successfully updated vehicle 🚀", {
+    await editVehicleApi(
+      vehicle._id,
+      data,
+      (response) => {
+        console.log(response.data);
+        toast.success("Successfully edited vehicle 🚀", {
           position: "top-right",
           autoClose: 3000,
           hideProgressBar: false,
@@ -182,11 +174,12 @@ const TableItem = ({
           draggable: true,
           progress: undefined,
         });
+        elementToSet(false);
         setRunQuery(true);
-      })
-      .catch(function (error) {
-        console.log(error);
-        toast.error("Error updating vehicle 😢", {
+      },
+      (error) => {
+        console.error(error);
+        toast.error("Error editing vehicle 😢", {
           position: "top-right",
           autoClose: 3000,
           hideProgressBar: false,
@@ -195,7 +188,8 @@ const TableItem = ({
           draggable: true,
           progress: undefined,
         });
-      });
+      }
+    );
   };
 
   return (
@@ -249,22 +243,15 @@ const VehicleRow = ({ vehicle, setRunQuery }) => {
   const [editBrand, setEditBrand] = useState(false);
   const [editModel, setEditModel] = useState(false);
   const [editColor, setEditColor] = useState(false);
-  const [editOwner, setEditOwner] = useState(false);
+  const [editPrice, setEditPrice] = useState(false);
 
   const [openDialog, setOpenDialog] = useState(false);
 
   const deleteVehicle = async () => {
-    var config = {
-      method: "DELETE",
-      url: `http://localhost:5000/cars/${vehicle._id}/`,
-      headers: {
-        "Content-Type": "application/json",
-      },
-    };
-
-    await axios(config)
-      .then(function (response) {
-        // console.log(JSON.stringify(response.data));
+    deleteVehicleApi(
+      vehicle._id,
+      (response) => {
+        console.log(response.data);
         toast.success("Successfully deleted vehicle 🚔", {
           position: "top-right",
           autoClose: 3000,
@@ -275,8 +262,8 @@ const VehicleRow = ({ vehicle, setRunQuery }) => {
           progress: undefined,
         });
         setRunQuery(true);
-      })
-      .catch(function (error) {
+      },
+      (error) => {
         console.log(error);
         toast.error("Error deleting vehicle 😢", {
           position: "top-right",
@@ -287,7 +274,8 @@ const VehicleRow = ({ vehicle, setRunQuery }) => {
           draggable: true,
           progress: undefined,
         });
-      });
+      }
+    );
   };
 
   return (
@@ -300,7 +288,7 @@ const VehicleRow = ({ vehicle, setRunQuery }) => {
         elementToSet={setEditName}
         currentItem={vehicle.name}
         importantDecision={"name"}
-        setRunQuery = {setRunQuery}
+        setRunQuery={setRunQuery}
       />
       <TableItem
         vehicle={vehicle}
@@ -308,7 +296,7 @@ const VehicleRow = ({ vehicle, setRunQuery }) => {
         elementToSet={setEditBrand}
         currentItem={vehicle.brand}
         importantDecision={"brand"}
-        setRunQuery = {setRunQuery}
+        setRunQuery={setRunQuery}
       />
       <TableItem
         vehicle={vehicle}
@@ -316,7 +304,7 @@ const VehicleRow = ({ vehicle, setRunQuery }) => {
         elementToSet={setEditModel}
         currentItem={vehicle.model}
         importantDecision={"model"}
-        setRunQuery = {setRunQuery}
+        setRunQuery={setRunQuery}
       />
       <TableItem
         vehicle={vehicle}
@@ -324,15 +312,15 @@ const VehicleRow = ({ vehicle, setRunQuery }) => {
         elementToSet={setEditColor}
         currentItem={vehicle.color}
         importantDecision={"color"}
-        setRunQuery = {setRunQuery}
+        setRunQuery={setRunQuery}
       />
       <TableItem
         vehicle={vehicle}
-        elementToEdit={editOwner}
-        elementToSet={setEditOwner}
-        currentItem={vehicle.owner}
-        importantDecision={"owner"}
-        setRunQuery = {setRunQuery}
+        elementToEdit={editPrice}
+        elementToSet={setEditPrice}
+        currentItem={vehicle.price}
+        importantDecision={"price"}
+        setRunQuery={setRunQuery}
       />
       <Tooltip title="Delete" arrow>
         <td>
@@ -377,12 +365,6 @@ const CarsTable = ({ vehiclesList, setRunQuery }) => {
 
   const form = useRef(null);
 
-  // const submitEditTableCars = (e) => {
-  //   e.preventDefault();
-  //   const fd = new FormData(form.current);
-  //   console.log(e);
-  // }
-
   const [search, setSearch] = useState("");
   const [filteredVehicles, setFilteredVehicles] = useState(vehiclesList);
 
@@ -426,7 +408,7 @@ const CarsTable = ({ vehiclesList, setRunQuery }) => {
                 <th>Brand</th>
                 <th>Model</th>
                 <th>Color</th>
-                <th>Owner</th>
+                <th>Price</th>
                 <th></th>
               </tr>
             </thead>
@@ -446,13 +428,16 @@ const CarsTable = ({ vehiclesList, setRunQuery }) => {
         <div className="flex flex-col sm:hidden">
           {filteredVehicles.map((e) => {
             return (
-              <div className="w-full bg-gray-500 rounded-xl p-5 my-2 flex flex-col shadow">
+              <div
+                className="w-full bg-gray-500 rounded-xl p-5 my-2 flex flex-col shadow"
+                key={nanoid()}
+              >
                 <span>{e._id.slice(18)}</span>
                 <span>{e.name}</span>
                 <span>{e.brand}</span>
                 <span>{e.model}</span>
                 <span>{e.color}</span>
-                <span>{e.owner}</span>
+                <span>{e.price}</span>
               </div>
             );
           })}
@@ -462,7 +447,7 @@ const CarsTable = ({ vehiclesList, setRunQuery }) => {
   );
 };
 
-const CarsForm = ({ setShowTable, vehiclesList, addVehicle }) => {
+const CarsForm = ({ setShowTable }) => {
   const form = useRef(null);
 
   const submitForm = async (e) => {
@@ -474,27 +459,18 @@ const CarsForm = ({ setShowTable, vehiclesList, addVehicle }) => {
       newVehicle[key] = value;
     });
 
-    var data = JSON.stringify({
-      // _id: newVehicle._id,
+    const createVehicleApiData = JSON.stringify({
       name: newVehicle.name,
       brand: newVehicle.brand,
       model: newVehicle.model,
       color: newVehicle.color,
-      owner: newVehicle.owner,
+      price: newVehicle.price,
     });
 
-    var config = {
-      method: "POST",
-      url: "http://localhost:5000/cars/",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      data: data,
-    };
-
-    await axios(config)
-      .then(function (response) {
-        // console.log(JSON.stringify(response.data));
+    await createVehicleApi(
+      createVehicleApiData,
+      (response) => {
+        console.log(response.data);
         toast.success("Successfully added vehicle 🦼", {
           position: "top-right",
           autoClose: 3000,
@@ -504,9 +480,9 @@ const CarsForm = ({ setShowTable, vehiclesList, addVehicle }) => {
           draggable: true,
           progress: undefined,
         });
-      })
-      .catch(function (error) {
-        console.log(error);
+      },
+      (error) => {
+        console.error(error);
         toast.error("Error adding vehicle 😢", {
           position: "top-right",
           autoClose: 3000,
@@ -516,11 +492,9 @@ const CarsForm = ({ setShowTable, vehiclesList, addVehicle }) => {
           draggable: true,
           progress: undefined,
         });
-      });
-
+      }
+    );
     setShowTable(true);
-
-    // addVehicle([...vehiclesList, newVehicle]);
   };
 
   return (
@@ -591,13 +565,13 @@ const CarsForm = ({ setShowTable, vehiclesList, addVehicle }) => {
               <option value="other">Other</option>
             </select>
           </label>
-          <label className="font-bold" htmlFor="owner">
-            Owner
+          <label className="font-bold" htmlFor="price">
+            Price
             <input
               className="w-full mb-2 bg-gray-100 border border-gray-400 rounded-lg outline-none focus:border-yellow-500 py-2 px-4"
-              type="text"
-              placeholder="Stephen William Hawking"
-              name="owner"
+              type="number"
+              placeholder='$123789'
+              name="price"
               required
             />
           </label>

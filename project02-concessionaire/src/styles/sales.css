@@ -1,0 +1,23 @@
+input{
+    background: transparent;
+    color: gray;
+}
+
+.sales-table td, .sales-table th{
+    padding: 0.5rem 1rem;
+}
+
+.sales-table th{
+    background-color: #fbbe24c2;
+}
+
+.sales-table tr:nth-child(odd){
+    background-color: rgba(100, 100, 100, 0.8);
+}
+.sales-table tr:nth-child(even){
+    background-color: rgba(50, 50, 50, 0.8);
+}
+
+.sales-table tr:hover, .sales-table{
+    background-color: #fbbe249d;
+}

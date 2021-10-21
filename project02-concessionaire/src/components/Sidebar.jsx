@@ -28,7 +28,7 @@ const Sidebar = () => {
             </Link>
           </li>
           <li className="w-full font-bold text-3xl text-gray-100 flex items-center justify-center my-5 py-2 px-4 hover:bg-yellow-300 hover:text-gray-800">
-            <Link to="/admin/clients">
+            <Link to="/admin/sales">
               <i className="fas fa-coins mr-1"></i>Sales
             </Link>
           </li>

@@ -8,9 +8,10 @@ import Index from "pages/Index";
 import PublicLayout from "layouts/PublicLayout";
 import PrivateLayout from "layouts/PrivateLayout";
 import AuthLayout from "layouts/AuthLayout";
-import Clients from "pages/Admin/Clients";
 import Cars from "pages/Admin/Cars";
+import Sales from "pages/Admin/Sales";
 import { DarkModeContext } from "context/darkMode";
+import Users from "pages/Admin/Users";
 
 function App() {
   const [darkMode, setDarkMode] = useState(false);
@@ -20,17 +21,22 @@ function App() {
   // }, [darkMode])
 
   return (
-    <DarkModeContext.Provider value={{darkMode, setDarkMode}}>
+    <DarkModeContext.Provider value={{ darkMode, setDarkMode }}>
       <Router>
         <Switch>
-          <Route path={["/admin", "/admin/clients", "/admin/cars"]}>
+          <Route
+            path={["/admin", "/admin/users", "/admin/cars", "/admin/sales"]}
+          >
             <PrivateLayout>
               <Switch>
-                <Route path="/admin/clients">
-                  <Clients />
+                <Route path="/admin/users">
+                  <Users />
                 </Route>
                 <Route path="/admin/cars">
                   <Cars />
+                </Route>
+                <Route path="/admin/sales">
+                  <Sales />
                 </Route>
                 <Route path="/admin">
                   <Admin />
