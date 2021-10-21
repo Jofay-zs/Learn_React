@@ -12,7 +12,7 @@ const queryCreateVehicle = async (vehicleData, callback) => {
     Object.keys(vehicleData).includes("brand") &&
     Object.keys(vehicleData).includes("model") &&
     Object.keys(vehicleData).includes("color") &&
-    Object.keys(vehicleData).includes("owner")
+    Object.keys(vehicleData).includes("price")
   ) {
     const conection = getConection();
     await conection.collection("vehicles").insertOne(vehicleData, callback);

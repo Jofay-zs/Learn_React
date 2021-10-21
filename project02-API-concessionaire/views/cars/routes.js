@@ -1,6 +1,5 @@
 import Express from "express";
 import {queryAllVehicles, queryCreateVehicle, queryUpdateVehicle, queryDeleteVehicle} from "../../controllers/cars/controller.js";
-import { getConection } from "../../db/db.js";
 
 const vehiclesRoutes = Express.Router();
 
