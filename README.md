@@ -8,6 +8,7 @@ In this project I try to simulate a manufaturing app for cars, a landing page is
 * I develop this page with React a JS library, which my knowledge was very little, but thanks to this project I was able to dig deeper.
 * HTML
 * CSS, for the styles I use Tailwind and for some components I use MaterialUI or custmon CSS styles.
-* Node.js for the backend.
+* Node.js for the backend and I used the express framework.
 * MongoDB for the Data Base.
 * Postman to probe and correct the petitions for the backend.
+* Auth0, to facilate the issue of login and authentication
