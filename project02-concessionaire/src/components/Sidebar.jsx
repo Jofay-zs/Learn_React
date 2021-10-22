@@ -1,5 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import { useAuth0 } from "@auth0/auth0-react";
 
 const Sidebar = () => {
   // const location = useLocation();
@@ -7,6 +8,8 @@ const Sidebar = () => {
   // useEffect(() => {
   //   console.log(location);
   // }, [location])
+
+  const { logout } = useAuth0();
 
   return (
     <nav className="fixed top-0 right-0 h-screen w-screen sm:w-1/2 lg:w-1/4 bg-gradient-to-b from-yellow-300 via-yellow-500 to-yellow-700 shadow">
@@ -38,7 +41,11 @@ const Sidebar = () => {
             </Link>
           </li>
           <li className="w-full text-xl text-yellow-100 flex items-center justify-center mb-5 mt-10 py-2 px-4 font-bold hover:underline">
-            <Link to="/"> Sign off </Link>
+            <button
+              onClick={() => logout({ returnTo: window.location.origin })}
+            >
+              Sign out
+            </button>
           </li>
         </ul>
       </div>
