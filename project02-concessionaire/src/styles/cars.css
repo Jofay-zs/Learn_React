@@ -1,23 +1,46 @@
 input{
-    background: transparent;
-    color: gray;
+  background: transparent;
+  color: #ffffff;
 }
 
-.cars-table td, .cars-table th{
-    padding: 0.5rem;
+.cars-table {
+  border-collapse: collapse;
+  font-size: 1rem;
+  min-width: 400px;
+  border-radius: 10px 10px 0 0;
+  overflow: hidden;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
 }
 
-.cars-table th{
-    background-color: #fbbe24c2;
+.cars-table thead tr {
+  background-color: #370d08;
+  color: #ffffff;
+  text-align: left;
+  font-weight: bold;
+  font-size: 1.2rem;
+  position: sticky;
+  top: 0;
+  left: 0;
 }
 
-.cars-table tr:nth-child(odd){
-    background-color: rgba(100, 100, 100, 0.8);
-}
-.cars-table tr:nth-child(even){
-    background-color: rgba(50, 50, 50, 0.8);
+.cars-table th,
+.cars-table td {
+  padding: 12px 15px;
 }
 
-.cars-table tr:hover, .cars-table{
-    background-color: #fbbe249d;
+.cars-table tbody tr {
+  border-bottom: 1px solid #ddd;
+}
+
+.cars-table tbody tr:nth-of-type(even) {
+  background-color: #bb8585;
+  color: #370d08;
+}
+
+/* .cars-table tbody tr:nth-of-type(odd) {
+  color: #fbbe24;
+} */
+
+.cars-table tbody tr:last-of-type {
+  border-bottom: 2px solid #370d08;
 }

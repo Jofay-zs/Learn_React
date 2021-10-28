@@ -12,9 +12,9 @@ const TriggerDarkMode = () => {
           }}
         >
           {darkMode ? (
-            <i className="fas fa-moon p-2 rounded-full hover:bg-gray-800 hover:text-gray-100"></i>
+            <i className="fixed top-4 right-20 fas fa-moon p-2 rounded-full text-myOrange hover:text-myRed z-20"></i>
           ) : (
-            <i className="fas fa-sun p-2 rounded-full hover:bg-gray-800 hover:text-gray-100"></i>
+            <i className="fixed top-4 right-20 fas fa-sun p-2 rounded-full text-myOrange hover:text-myRed z-20"></i>
           )}
         </button>
       </div>

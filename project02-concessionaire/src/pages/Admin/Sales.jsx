@@ -7,6 +7,7 @@ import { nanoid } from "nanoid";
 import { createSaleApi } from "utils/api";
 import { useDarkMode } from "context/darkMode";
 import "styles/sales.css";
+import FormButton from "components/FormButton";
 
 const Sales = () => {
   const [vendors, setVendors] = useState([]);
@@ -69,8 +70,6 @@ const Sales = () => {
       formData[key] = value;
     });
 
-    console.log("form data", formData);
-
     //Iterate over the keys of this object
     const vehiclesList = Object.keys(formData)
       .map((k) => {
@@ -81,8 +80,6 @@ const Sales = () => {
       })
       .filter((v) => v);
 
-    console.log("Vehicles list:", vehiclesList);
-
     const saleData = {
       vendor: vendors.filter((v) => v._id === formData.vendor)[0],
       totalPurchaseValue: formData.totalPurchase,
@@ -92,7 +89,6 @@ const Sales = () => {
     await createSaleApi(
       saleData,
       (response) => {
-        console.log(response);
         toast.success("Successfully added sale 🦼", {
           position: "top-right",
           autoClose: 3000,
@@ -133,7 +129,7 @@ const Sales = () => {
             <span className="font-bold">Vendor Selection</span>
             <select
               name="vendor"
-              className="w-full mb-2 bg-gray-100 border border-gray-400 rounded-lg outline-none focus:border-yellow-500 py-2 px-4 text-gray-800"
+              className="w-full mb-2 bg-gray-100 border border-gray-400 rounded-lg outline-none focus:border-primary py-2 px-4 text-gray-800"
               defaultValue=""
               required
             >
@@ -155,13 +151,7 @@ const Sales = () => {
             setVehicles={setVehicles}
             setVehiclesTable={setVehiclesTable}
           />
-
-          <button
-            type="submit"
-            className="font-bold mt-5 w-full col-span-2 p-2 bg-gradient-to-r border border-yellow-500 shadow-md rounded-full hover:from-yellow-400 hover:via-yellow-500 hover:to-yellow-600 hover:text-gray-100"
-          >
-            Create sale
-          </button>
+          <FormButton type='submit' description='Create Sale'/>
         </form>
       </section>
     </div>
@@ -217,7 +207,7 @@ const VehiclesTable = ({ vehicles, setVehicles, setVehiclesTable }) => {
         </div>
         <label htmlFor="vehicle" className="flex flex-col">
           <select
-            className="w-full mb-2 bg-gray-100 border border-gray-400 rounded-lg outline-none focus:border-yellow-500 py-2 px-4 text-gray-800"
+            className="w-full mb-2 bg-gray-100 border border-gray-400 rounded-lg outline-none focus:border-primary py-2 px-4 text-gray-800"
             value={actualAddedVehicle._id ?? ""}
             onChange={(e) => {
               setActualAddedVehicle(
@@ -239,6 +229,7 @@ const VehiclesTable = ({ vehicles, setVehicles, setVehiclesTable }) => {
           </select>
         </label>
         <button
+          className="font-bold mt-5 w-full col-span-2 p-2 border border-gray-200 shadow-md rounded-full hover:bg-myRed hover:text-gray-100"
           type="button"
           onClick={() => {
             addNewVehicle();
@@ -246,7 +237,7 @@ const VehiclesTable = ({ vehicles, setVehicles, setVehiclesTable }) => {
         >
           Add new vehicle
         </button>
-        <section className="h-auto max-h-80 overflow-y-scroll w-full">
+        <section className="h-auto max-h-80 overflow-y-scroll w-full mt-10">
           <table className="sales-table h-auto max-h-96 overflow-y-scroll w-full">
             <thead className="sticky top-0">
               <tr>

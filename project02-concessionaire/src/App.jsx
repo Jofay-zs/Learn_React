@@ -13,6 +13,7 @@ import Sales from "pages/Admin/Sales";
 import { DarkModeContext } from "context/darkMode";
 import Users from "pages/Admin/Users";
 import { Auth0Provider } from "@auth0/auth0-react";
+import Account from "pages/Admin/Account";
 
 function App() {
   const [darkMode, setDarkMode] = useState(false);
@@ -21,7 +22,8 @@ function App() {
     <Auth0Provider
       domain="project02-concessionaire-jofay-zs.us.auth0.com"
       clientId="7IyPaRV3Oq4uMIdzQ1SlTyAL6t2j782y"
-      redirectUri='http://localhost:3000/admin'
+      redirectUri="http://localhost:3000/admin"
+      audience="authentication-api-projec02-concessionaire"
     >
       <DarkModeContext.Provider value={{ darkMode, setDarkMode }}>
         <Router>
@@ -31,6 +33,9 @@ function App() {
             >
               <PrivateLayout>
                 <Switch>
+                  <Route path="/admin/account">
+                    <Account/>
+                  </Route>
                   <Route path="/admin/users">
                     <Users />
                   </Route>

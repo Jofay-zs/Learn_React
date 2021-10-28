@@ -11,13 +11,13 @@ const PrivateLayout = ({ children }) => {
 
   return (
     <PrivateRoute>
-      <div className="w-screen  h-auto sm:h-screen flex flex-col">
+      <div className="w-screen h-auto min-h-screen sm:h-screen flex flex-col">
         <ResponsiveNavbar />
         {showNavbar ? <Sidebar /> : <div />}
         <div className="flex flex-nowrap h-full w-full ">
-          <div className="absolute top-4 right-10">
+          <div className="absolute top-4 right-10 z-20">
             <button
-              className="text-2xl hover:text-gray-700"
+              className="text-2xl text-myOrange hover:text-myRed"
               type="button"
               onClick={() => {
                 setShowNavbar(!showNavbar);
@@ -29,8 +29,8 @@ const PrivateLayout = ({ children }) => {
           <div
             className={`flex w-full ${
               darkMode
-                ? "bg-hero-pattern-diamonds-dark"
-                : "bg-hero-pattern-diamonds-light"
+                ? "bg-secondary"
+                : "bg-gray-100"
             }`}
           >
             <main>{children}</main>

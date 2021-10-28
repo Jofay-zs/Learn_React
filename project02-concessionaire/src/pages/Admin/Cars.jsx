@@ -11,6 +11,9 @@ import {
   editVehicleApi,
   deleteVehicleApi,
 } from "utils/api";
+import Loading from "components/Loading";
+import FormInput from "components/FormInput";
+import FormButton from "components/FormButton";
 
 const Cars = () => {
   const [showTable, setShowTable] = useState(false);
@@ -19,17 +22,16 @@ const Cars = () => {
   const [vehicles, setVehicles] = useState([]);
   const [runQuery, setRunQuery] = useState(true);
   const { darkMode } = useDarkMode();
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    console.log("Query:", runQuery);
-    if (runQuery) {
-      getVehiclesApi(
+    const fetchVehicles = async () => {
+      setLoading(true);
+      await getVehiclesApi(
         (response) => {
-          console.log(
-            "The response received was:",
-            JSON.stringify(response.data)
-          );
           setVehicles(response.data);
+          setRunQuery(false);
+          setLoading(false);
         },
         (error) => {
           console.error("There is an error:", error);
@@ -42,13 +44,13 @@ const Cars = () => {
             draggable: true,
             progress: undefined,
           });
+          setLoading(false);
         }
       );
-      setRunQuery(false);
-      //   if (runQuery) {
-      //     obtainVehicles(setVehicles);
-      //     setRunQuery(false);
-      //   }
+    };
+
+    if (runQuery) {
+      fetchVehicles();
     }
   }, [runQuery]);
 
@@ -69,12 +71,12 @@ const Cars = () => {
     if (showTable) {
       setButtonText("Create new car");
       setChangeButtonColor(
-        "hover:from-yellow-400 hover:via-yellow-500 hover:to-yellow-600"
+        "hover:bg-myRed"
       );
     } else {
       setButtonText("Show all");
       setChangeButtonColor(
-        "hover:from-yellow-600 hover:via-yellow-500 hover:to-yellow-400"
+        "hover:bg-myRed"
       );
     }
   }, [showTable]);
@@ -92,14 +94,19 @@ const Cars = () => {
             onClick={() => {
               setShowTable(!showTable);
             }}
-            className={`font-bold text-xl bg-gradient-to-r border border-yellow-500  py-2 px-4 shadow rounded ${changeButtonColor} hover:text-gray-100`}
+            className={`font-bold text-xl bg-gradient-to-r border border-gray-200 py-2 px-4 shadow rounded ${changeButtonColor} hover:text-gray-100`}
           >
             {buttonText}
           </button>
         </div>
       </div>
+
       {showTable ? (
-        <CarsTable vehiclesList={vehicles} setRunQuery={setRunQuery} />
+        <CarsTable
+          vehiclesList={vehicles}
+          setRunQuery={setRunQuery}
+          loading={loading}
+        />
       ) : (
         <CarsForm
           setShowTable={setShowTable}
@@ -130,6 +137,7 @@ const TableItem = ({
   importantDecision,
   setRunQuery,
 }) => {
+  const {darkMode} = useDarkMode();
   const [item] = useState(currentItem);
   const edit = elementToEdit;
   const set = elementToSet;
@@ -198,7 +206,7 @@ const TableItem = ({
         <div className="flex items-center">
           <input
             type="text"
-            className="w-full outline-none border border-gray-800 px-2 py-1 text-gray-800"
+            className={`w-full outline-none border px-2 py-1 ${darkMode ? 'text-gray-200 border-gray-200' : 'text-gray-800 border-gray-800'}`}
             defaultValue={item}
             onChange={(e) => {
               temporal = e.target.value;
@@ -207,7 +215,7 @@ const TableItem = ({
           <button type="submit">
             <Tooltip title="Confirm" arrow>
               <i
-                className="fas fa-check text-gray-800 mx-1 cursor-pointer text-xl hover:text-green-500"
+                className="fas fa-check text-gray-200 mx-1 cursor-pointer text-xl hover:text-green-500"
                 onClick={() => {
                   set(!edit);
                   updateVehicle();
@@ -217,7 +225,7 @@ const TableItem = ({
           </button>
           <Tooltip title="Cancel" arrow>
             <i
-              className="fas fa-times text-gray-800 mx-1 cursor-pointer text-xl hover:text-red-500"
+              className="fas fa-times text-gray-200 mx-1 cursor-pointer text-xl hover:text-red-500"
               onClick={() => {
                 set(!edit);
               }}
@@ -264,7 +272,7 @@ const VehicleRow = ({ vehicle, setRunQuery }) => {
         setRunQuery(true);
       },
       (error) => {
-        console.log(error);
+        console.error(error);
         toast.error("Error deleting vehicle 😢", {
           position: "top-right",
           autoClose: 3000,
@@ -360,10 +368,8 @@ const VehicleRow = ({ vehicle, setRunQuery }) => {
   );
 };
 
-const CarsTable = ({ vehiclesList, setRunQuery }) => {
+const CarsTable = ({ vehiclesList, setRunQuery, loading }) => {
   const { darkMode } = useDarkMode();
-
-  const form = useRef(null);
 
   const [search, setSearch] = useState("");
   const [filteredVehicles, setFilteredVehicles] = useState(vehiclesList);
@@ -393,56 +399,61 @@ const CarsTable = ({ vehiclesList, setRunQuery }) => {
           }}
           type="text"
           placeholder={"Search"}
-          className="w-auto my-2 bg-gray-100 border border-gray-400 rounded-lg outline-none focus:border-yellow-500 py-2 px-4"
+          className="w-auto my-2 bg-gray-100 border border-gray-400 rounded-lg outline-none focus:border-primary py-2 px-4"
         />
         <i className="fas fa-search ml-2 text-xl"></i>
       </div>
-      {/* //onSubmit={submitEditTableCars} */}
-      <form ref={form} className="w-full">
-        <div className="hidden sm:block max-h-96 overflow-y-auto">
-          <table className="cars-table w-full">
-            <thead className="text-xl font-bold">
-              <tr>
-                <th>ID</th>
-                <th>Name</th>
-                <th>Brand</th>
-                <th>Model</th>
-                <th>Color</th>
-                <th>Price</th>
-                <th></th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredVehicles.map((vehicle) => {
-                return (
-                  <VehicleRow
-                    key={nanoid()}
-                    vehicle={vehicle}
-                    setRunQuery={setRunQuery}
-                  />
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
-        <div className="flex flex-col sm:hidden">
-          {filteredVehicles.map((e) => {
-            return (
-              <div
-                className="w-full bg-gray-500 rounded-xl p-5 my-2 flex flex-col shadow"
-                key={nanoid()}
-              >
-                <span>{e._id.slice(18)}</span>
-                <span>{e.name}</span>
-                <span>{e.brand}</span>
-                <span>{e.model}</span>
-                <span>{e.color}</span>
-                <span>{e.price}</span>
-              </div>
-            );
-          })}
-        </div>
-      </form>
+      {loading ? (
+        <Loading />
+      ) : (
+        <>
+          <section className="w-full">
+            <div className="hidden sm:block h-96 w-full overflow-y-scroll">
+              <table className="cars-table w-full h-full">
+                <thead className="sticky top-0">
+                  <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Brand</th>
+                    <th>Model</th>
+                    <th>Color</th>
+                    <th>Price</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filteredVehicles.map((vehicle) => {
+                    return (
+                      <VehicleRow
+                        key={nanoid()}
+                        vehicle={vehicle}
+                        setRunQuery={setRunQuery}
+                      />
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          </section>
+          <section className="flex flex-col sm:hidden w-full">
+            {filteredVehicles.map((e) => {
+              return (
+                <div
+                  className="w-full bg-gray-500 rounded-xl p-5 my-2 flex flex-col shadow"
+                  key={nanoid()}
+                >
+                  <span>{e._id.slice(18)}</span>
+                  <span>{e.name}</span>
+                  <span>{e.brand}</span>
+                  <span>{e.model}</span>
+                  <span>{e.color}</span>
+                  <span>{e.price}</span>
+                </div>
+              );
+            })}
+          </section>
+        </>
+      )}
     </div>
   );
 };
@@ -508,44 +519,33 @@ const CarsForm = ({ setShowTable }) => {
           onSubmit={submitForm}
           className="block w-screen py-5 px-7 sm:grid sm:grid-cols-2 sm:gap-5 sm:px-20 lg:px-52 xl:px-72 2xl:px-96"
         >
-          <label className="font-bold" htmlFor="name">
-            Name
-            <input
-              className="w-full mb-2 bg-gray-100 border border-gray-400 rounded-lg outline-none focus:border-yellow-500 py-2 px-4"
-              type="text"
-              placeholder="Tesla model S"
-              name="name"
-              required
-            />
-          </label>
-          <label className="font-bold" htmlFor="brand">
-            Brand
-            <input
-              className="w-full mb-2 bg-gray-100 border border-gray-400 rounded-lg outline-none focus:border-yellow-500 py-2 px-4"
-              type="text"
-              placeholder="Tesla"
-              name="brand"
-              required
-            />
-          </label>
-          <label className="font-bold" htmlFor="model">
-            Model
-            <input
-              className="w-full mb-2 bg-gray-100 border border-gray-400 rounded-lg outline-none focus:border-yellow-500 py-2 px-4"
-              type="number"
-              placeholder="2020"
-              name="model"
-              min="1950"
-              max="2022"
-              required
-            />
-          </label>
+          <FormInput
+            htmlFor="name"
+            description="Name"
+            type="text"
+            placeholder="Tesla Model S"
+            inputName="name"
+          />
+          <FormInput
+            htmlFor="brand"
+            description="Brand"
+            type="text"
+            placeholder="Tesla"
+            inputName="brand"
+          />
+          <FormInput
+            htmlFor="model"
+            description="Model"
+            type="number"
+            placeholder="2020"
+            inputName="model"
+          />
           <label className="font-bold" htmlFor="color">
             Color
             <select
               name="color"
               id="color"
-              className={`text-gray-800 w-full mb-2 bg-gray-100 border border-gray-400 rounded-lg outline-none focus:border-yellow-500 py-2 px-4`}
+              className={`text-gray-800 w-full mb-2 bg-gray-100 border border-gray-400 rounded-lg outline-none focus:border-myRed py-2 px-4`}
               required
               defaultValue={0}
             >
@@ -565,22 +565,14 @@ const CarsForm = ({ setShowTable }) => {
               <option value="other">Other</option>
             </select>
           </label>
-          <label className="font-bold" htmlFor="price">
-            Price
-            <input
-              className="w-full mb-2 bg-gray-100 border border-gray-400 rounded-lg outline-none focus:border-yellow-500 py-2 px-4"
-              type="number"
-              placeholder='$123789'
-              name="price"
-              required
-            />
-          </label>
-          <button
-            type="submit"
-            className="font-bold mt-5 w-full col-span-2 p-2 bg-gradient-to-r border border-yellow-500 shadow-md rounded-full hover:from-yellow-400 hover:via-yellow-500 hover:to-yellow-600 hover:text-gray-100"
-          >
-            Save car
-          </button>
+          <FormInput
+            htmlFor="price"
+            description="Price"
+            type="number"
+            placeholder="$"
+            inputName="price"
+          />
+          <FormButton type='submit' description='Save car' />
         </form>
       </div>
     </div>

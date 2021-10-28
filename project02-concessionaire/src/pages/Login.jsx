@@ -1,7 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import logo from "images/logo.png";
-import googleLogo from 'images/googleLogo-01.png';
+import logo from "images/car.ico";
 
 // Recomendation: When you use tailwind, you need to make first the mobile design and then the desktop and tablet design. That's because
 // tailwind doesn't have @media querys for max-widths, only for min-widths. So if you make first the design for desktop it will break
@@ -76,7 +75,7 @@ const Login = () => {
         <div className="block">
           <div>
             <button className="w-full border border-yellow-500 shadow bg-gradient-to-r px-4 py-2 rounded-md text-gray-800 hover:text-gray-100 hover:from-yellow-400 hover:via-yellow-500 hover:to-yellow-600 my-1 flex align-middle justify-center">
-              <img src={googleLogo} alt="google brand" className="w-8 mr-2" />
+              <img src={logo} alt='Insert description' />
               <span className="text-lg font-bold">Google</span>
             </button>
           </div>

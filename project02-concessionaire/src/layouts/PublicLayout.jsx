@@ -1,32 +1,28 @@
-import React from 'react'
-import Footer from 'components/Footer';
-import Navbar from 'components/Navbar';
-import { useState } from 'react';
+import React from "react";
+import Footer from "components/Footer";
+import { useAuth0 } from "@auth0/auth0-react";
+import logo from "images/car.ico";
 
-const PublicLayout = ({children}) => {
+const PublicLayout = ({ children }) => {
+  const { loginWithRedirect } = useAuth0();
 
-  const [showNavbar, setShowNavbar] = useState(false);
-
-    return (
-      <div className="flex flex-col justify-between h-screen">
-        {showNavbar ? <Navbar /> : <div />}
-        <div>
-          <button
-            className="absolute top-4 right-10 text-2xl hover:text-gray-700"
-            type="button"
-            onClick={() => {
-              setShowNavbar(!showNavbar);
-            }}
-          >
-            <i className="fas fa-bars"></i>
-          </button>
-        </div>
-        <div className="h-full overflow-y-scroll block">
-          <main>{children}</main>
-          <Footer />
-        </div>
+  return (
+    <div className="flex flex-col justify-between h-screen">
+      <div>
+        <button
+          type="button"
+          className="absolute top-4 right-10 hover:text-gray-700"
+          onClick={() => loginWithRedirect()}
+        >
+          <img src={logo} alt="" className="w-16" />
+        </button>
       </div>
-    );
+      <div className="h-full block">
+        <main>{children}</main>
+        <Footer />
+      </div>
+    </div>
+  );
 };
 
 export default PublicLayout;
