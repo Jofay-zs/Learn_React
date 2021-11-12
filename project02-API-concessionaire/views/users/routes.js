@@ -4,6 +4,8 @@ import {
   queryCreateUser,
   queryUpdateUser,
   queryDeleteUser,
+  queryConsultUser,
+  queryConsultOrCreateUser,
 } from "../../controllers/users/controller.js";
 
 const usersRoutes = Express.Router();
@@ -21,6 +23,15 @@ const generalCallback = (res) => {
 usersRoutes.route("/users").post((req, res) => {
   queryCreateUser(req.body, generalCallback(res));
 });
+
+usersRoutes.route("/users/self").get((req, res) => {
+  queryConsultOrCreateUser(req, generalCallback(res));
+});
+
+usersRoutes.route("/users/:id").get((req, res) => {
+  queryConsultUser(req.params.id, generalCallback(res));
+});
+
 
 usersRoutes.route("/users").get((req, res) => {
   queryAllUsers(generalCallback(res));
