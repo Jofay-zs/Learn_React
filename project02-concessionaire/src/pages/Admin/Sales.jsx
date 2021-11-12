@@ -12,9 +12,28 @@ import FormButton from "components/FormButton";
 const Sales = () => {
   const [vendors, setVendors] = useState([]);
   const [vehicles, setVehicles] = useState([]);
+  const [changeButtonColor, setChangeButtonColor] = useState("indigo");
+  const [buttonText, setButtonText] = useState("Create new car");
   const form = useRef(null);
   const { darkMode } = useDarkMode();
   const [vehiclesTable, setVehiclesTable] = useState([]);
+  const [showTable, setShowTable] = useState(false);
+
+  useEffect(() => {
+    /**
+     * If my const showTable is true the button in line 86, this is going to show the default text and color
+     * but if it's false, it's going to change the text and color.
+     *
+     * Keep in mind that, when I press the button it will change the state, that
+     */
+    if (showTable) {
+      setButtonText("Show Sales");
+      setChangeButtonColor("hover:bg-myRed");
+    } else {
+      setButtonText("New Sale");
+      setChangeButtonColor("hover:bg-myRed");
+    }
+  }, [showTable]);
 
   useEffect(() => {
     const fetchVendors = async () => {
@@ -113,50 +132,89 @@ const Sales = () => {
       }
     );
   };
-
   return (
-    <div
-      className={`h-full w-screen flex flex-col justify-center items-center ${
-        darkMode ? "text-gray-100" : "text-gray-800"
-      }`}
-    >
-      <header className="w-full flex justify-center items-center py-4">
-        <h2 className="text-3xl font-extrabold">Add a new Sale</h2>
-      </header>
-      <section className="w-full h-full flex flex-col justify-center items-center px-4">
-        <form onSubmit={submitForm} ref={form} className="">
-          <label htmlFor="vendor" className="flex flex-col">
-            <span className="font-bold">Vendor Selection</span>
-            <select
-              name="vendor"
-              className="w-full mb-2 bg-gray-100 border border-gray-400 rounded-lg outline-none focus:border-primary py-2 px-4 text-gray-800"
-              defaultValue=""
-              required
-            >
-              <option disabled value="">
-                Select a vendor
-              </option>
-              {vendors.map((el) => {
-                return (
-                  <option
-                    key={nanoid()}
-                    value={el._id}
-                  >{`${el.name} ${el.lastName}`}</option>
-                );
-              })}
-            </select>
-          </label>
-          <VehiclesTable
-            vehicles={vehicles}
-            setVehicles={setVehicles}
-            setVehiclesTable={setVehiclesTable}
-          />
-          <FormButton type='submit' description='Create Sale'/>
-        </form>
-      </section>
+    <div className="flex flex-col items-center w-screen px-10 h-auto sm:h-full">
+      <div className="flex justify-center items-center mb-5 sm:block sm:p-5">
+        <button
+          onClick={() => {
+            setShowTable(!showTable);
+          }}
+          className={`font-bold text-xl bg-gradient-to-r border border-gray-200 py-2 px-4 shadow rounded ${changeButtonColor} hover:text-gray-100`}
+        >
+          {buttonText}
+        </button>
+      </div>
+      {showTable ? (
+        <div
+          className={`h-full w-screen flex flex-col justify-center items-center ${
+            darkMode ? "text-gray-100" : "text-gray-800"
+          }`}
+        >
+          <header className="w-full flex justify-center items-center py-4">
+            <h2 className="text-3xl font-extrabold">Add a new Sale</h2>
+          </header>
+          <section className="w-full h-full flex flex-col justify-center items-center px-4">
+            <form onSubmit={submitForm} ref={form} className="">
+              <label htmlFor="vendor" className="flex flex-col">
+                <span className="font-bold">Vendor Selection</span>
+                <select
+                  name="vendor"
+                  className="w-full mb-2 bg-gray-100 border border-gray-400 rounded-lg outline-none focus:border-primary py-2 px-4 text-gray-800"
+                  defaultValue=""
+                  required
+                >
+                  <option disabled value="">
+                    Select a vendor
+                  </option>
+                  {vendors.map((el) => {
+                    return (
+                      <option
+                        key={nanoid()}
+                        value={el._id}
+                      >{`${el.name} - ${el.rol}`}</option>
+                    );
+                  })}
+                </select>
+              </label>
+              <VehiclesTable
+                vehicles={vehicles}
+                setVehicles={setVehicles}
+                setVehiclesTable={setVehiclesTable}
+              />
+              <FormButton type="submit" description="Create Sale" />
+            </form>
+          </section>
+        </div>
+      ) : (
+        <SalesTable />
+      )}
     </div>
   );
 };
+
+const SalesTable = () => {
+  return (
+    <section className='w-full'>
+    <div className="hidden sm:block h-96 w-full overflow-y-scroll">
+      <table className="cars-table w-full h-full">
+        <thead className="sticky top-0">
+          <tr>
+            <th>Id-Sale</th>
+            <th>Vendor</th>
+            <th>Total value</th>
+            <th>Vehicles</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    </section>
+  );
+}
 
 const VehiclesTable = ({ vehicles, setVehicles, setVehiclesTable }) => {
   const [actualAddedVehicle, setActualAddedVehicle] = useState({});

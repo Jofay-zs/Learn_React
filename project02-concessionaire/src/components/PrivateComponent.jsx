@@ -1,8 +1,7 @@
 import { useUserContext } from "context/userContext";
 import React from "react";
-import UnauthorizedAlert from "./UnauthorizedAlert";
 
-const PrivateRoute = ({ roleList, children }) => {
+const PrivateComponent = ({ roleList, children }) => {
   const { userData } = useUserContext();
 
   // console.log("Private Component:", userData);
@@ -11,7 +10,7 @@ const PrivateRoute = ({ roleList, children }) => {
     return children;
   }
 
-  return <UnauthorizedAlert/>;
+  return <></>;
 };
 
-export default PrivateRoute;
+export default PrivateComponent;

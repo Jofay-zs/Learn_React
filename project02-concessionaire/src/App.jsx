@@ -14,9 +14,12 @@ import { DarkModeContext } from "context/darkMode";
 import Users from "pages/Admin/Users";
 import { Auth0Provider } from "@auth0/auth0-react";
 import Account from "pages/Admin/Account";
+import { UserContext } from "context/userContext";
+import PrivateRoute from "components/PrivateRoute";
 
 function App() {
   const [darkMode, setDarkMode] = useState(false);
+  const [userData, setUserData] = useState({});
 
   return (
     <Auth0Provider
@@ -25,56 +28,68 @@ function App() {
       redirectUri="http://localhost:3000/admin"
       audience="authentication-api-projec02-concessionaire"
     >
-      <DarkModeContext.Provider value={{ darkMode, setDarkMode }}>
-        <Router>
-          <Switch>
-            <Route
-              path={["/admin", "/admin/users", "/admin/cars", "/admin/sales"]}
-            >
-              <PrivateLayout>
-                <Switch>
-                  <Route path="/admin/account">
-                    <Account/>
-                  </Route>
-                  <Route path="/admin/users">
-                    <Users />
-                  </Route>
-                  <Route path="/admin/cars">
-                    <Cars />
-                  </Route>
-                  <Route path="/admin/sales">
-                    <Sales />
-                  </Route>
-                  <Route path="/admin">
-                    <Admin />
-                  </Route>
-                </Switch>
-              </PrivateLayout>
-            </Route>
-            <Route path={["/login", "/signup"]}>
-              <AuthLayout>
-                <Switch>
-                  <Route path="/login">
-                    <Login />
-                  </Route>
-                  <Route path="/signup">
-                    <Signup />
-                  </Route>
-                </Switch>
-              </AuthLayout>
-            </Route>
-            <Route path={["/"]}>
-              <PublicLayout>
-                <Switch>
-                  <Route path="/">
-                    <Index />
-                  </Route>
-                </Switch>
-              </PublicLayout>
-            </Route>
-          </Switch>
-        </Router>
-      </DarkModeContext.Provider>
+      <UserContext.Provider value={{ userData, setUserData }}>
+        <DarkModeContext.Provider value={{ darkMode, setDarkMode }}>
+          <Router>
+            <Switch>
+              <Route
+                path={["/admin", "/admin/users", "/admin/cars", "/admin/sales"]}
+              >
+                <PrivateLayout>
+                  <Switch>
+                    <Route path="/admin/account">
+                      <PrivateRoute roleList={["admin", "vendor", "inactive"]}>
+                        <Account />
+                      </PrivateRoute>
+                    </Route>
+                    <Route path="/admin/users">
+                      <PrivateRoute roleList={["admin"]}>
+                        <Users />
+                      </PrivateRoute>
+                    </Route>
+                    <Route path="/admin/cars">
+                      <PrivateRoute roleList={["admin", "vendor"]}>
+                        <Cars />
+                      </PrivateRoute>
+                    </Route>
+                    <Route path="/admin/sales">
+                      <PrivateRoute roleList={["admin", "vendor"]}>
+                        <Sales />
+                      </PrivateRoute>
+                    </Route>
+                    <Route path="/admin">
+                      <PrivateRoute roleList={["admin", "vendor", "inactive"]}>
+                        <Admin />
+                      </PrivateRoute>
+                    </Route>
+                  </Switch>
+                </PrivateLayout>
+              </Route>
+              <Route path={["/login", "/signup"]}>
+                <AuthLayout>
+                  <Switch>
+                    <Route path="/login">
+                      <Login />
+                    </Route>
+                    <Route path="/signup">
+                      <Signup />
+                    </Route>
+                  </Switch>
+                </AuthLayout>
+              </Route>
+              <Route path={["/"]}>
+                <PublicLayout>
+                  <Switch>
+                    <Route path="/">
+                      <Index />
+                    </Route>
+                  </Switch>
+                </PublicLayout>
+              </Route>
+            </Switch>
+          </Router>
+        </DarkModeContext.Provider>
+      </UserContext.Provider>
     </Auth0Provider>
   );
 }

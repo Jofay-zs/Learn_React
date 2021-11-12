@@ -14,6 +14,7 @@ import {
 import Loading from "components/Loading";
 import FormInput from "components/FormInput";
 import FormButton from "components/FormButton";
+import PrivateComponent from "components/PrivateComponent";
 
 const Cars = () => {
   const [showTable, setShowTable] = useState(false);
@@ -172,7 +173,7 @@ const TableItem = ({
       vehicle._id,
       data,
       (response) => {
-        console.log(response.data);
+        // console.log(response.data);
         toast.success("Successfully edited vehicle 🚀", {
           position: "top-right",
           autoClose: 3000,
@@ -206,31 +207,37 @@ const TableItem = ({
         <div className="flex items-center">
           <input
             type="text"
-            className={`w-full outline-none border px-2 py-1 ${darkMode ? 'text-gray-200 border-gray-200' : 'text-gray-800 border-gray-800'}`}
+            className={`w-full outline-none border px-2 py-1 ${
+              darkMode
+                ? "text-gray-200 border-gray-200"
+                : "text-gray-800 border-gray-800"
+            }`}
             defaultValue={item}
             onChange={(e) => {
               temporal = e.target.value;
             }}
           />
-          <button type="submit">
-            <Tooltip title="Confirm" arrow>
+          <PrivateComponent roleList={['admin']}>
+            <button type="submit">
+              <Tooltip title="Confirm" arrow>
+                <i
+                  className="fas fa-check text-gray-200 mx-1 cursor-pointer text-xl hover:text-green-500"
+                  onClick={() => {
+                    set(!edit);
+                    updateVehicle();
+                  }}
+                ></i>
+              </Tooltip>
+            </button>
+            <Tooltip title="Cancel" arrow>
               <i
-                className="fas fa-check text-gray-200 mx-1 cursor-pointer text-xl hover:text-green-500"
+                className="fas fa-times text-gray-200 mx-1 cursor-pointer text-xl hover:text-red-500"
                 onClick={() => {
                   set(!edit);
-                  updateVehicle();
                 }}
               ></i>
             </Tooltip>
-          </button>
-          <Tooltip title="Cancel" arrow>
-            <i
-              className="fas fa-times text-gray-200 mx-1 cursor-pointer text-xl hover:text-red-500"
-              onClick={() => {
-                set(!edit);
-              }}
-            ></i>
-          </Tooltip>
+          </PrivateComponent>
         </div>
       ) : (
         <div
@@ -259,7 +266,7 @@ const VehicleRow = ({ vehicle, setRunQuery }) => {
     deleteVehicleApi(
       vehicle._id,
       (response) => {
-        console.log(response.data);
+        // console.log(response.data);
         toast.success("Successfully deleted vehicle 🚔", {
           position: "top-right",
           autoClose: 3000,
@@ -330,7 +337,7 @@ const VehicleRow = ({ vehicle, setRunQuery }) => {
         importantDecision={"price"}
         setRunQuery={setRunQuery}
       />
-      <Tooltip title="Delete" arrow>
+      <Tooltip title="Delete" placement="left">
         <td>
           <div className="flex items-center justify-center m-0 p-0 ">
             <i
@@ -481,7 +488,7 @@ const CarsForm = ({ setShowTable }) => {
     await createVehicleApi(
       createVehicleApiData,
       (response) => {
-        console.log(response.data);
+        // console.log(response.data);
         toast.success("Successfully added vehicle 🦼", {
           position: "top-right",
           autoClose: 3000,

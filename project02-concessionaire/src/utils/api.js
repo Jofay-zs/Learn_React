@@ -1,6 +1,6 @@
 import axios from "axios";
 
-// Token that allows access to the request
+// Functio to send the token that allows access to the request to express
 const getToken = () =>{
   return `Bearer ${localStorage.getItem('token')}`
 }
@@ -60,6 +60,26 @@ export const getUsersApi = async (success, error) => {
   await axios.request(options).then(success).catch(error);
 };
 
+export const getInfoUserApi = async (success, error) => {
+  const options = {
+    method: "GET",
+    url: "http://localhost:5000/users/self/",
+    headers: {
+      Authorization: getToken(),
+    },
+  };
+  await axios.request(options).then(success).catch(error);
+};
+
+export const editUserApi = async (id, data, success, error) => {
+  const options = {
+    method: "PATCH",
+    url: `http://localhost:5000/users/${id}/`,
+    headers: { "Content-Type": "application/json", Authorization: getToken() },
+    data,
+  };
+  await axios.request(options).then(success).catch(error);
+};
 
 // Sales CRUD
 export const getSalesApi = async (success, error) => {

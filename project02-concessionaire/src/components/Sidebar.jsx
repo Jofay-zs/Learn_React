@@ -1,6 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { useAuth0 } from "@auth0/auth0-react";
+import PrivateComponent from "./PrivateComponent";
 
 const Sidebar = () => {
   // const location = useLocation();
@@ -42,26 +43,34 @@ const Sidebar = () => {
               )}
             </Link>
           </li>
-          <li className="w-full font-bold text-3xl text-gray-200 flex items-center justify-center my-5 py-2 px-4 hover:bg-myRed hover:text-gray-200">
-            <Link to="/admin">
-              <i className="fas fa-brain mr-1"></i>Master
-            </Link>
-          </li>
-          <li className="w-full font-bold text-3xl text-gray-200 flex items-center justify-center my-5 py-2 px-4 hover:bg-myRed hover:text-gray-200">
-            <Link to="/admin/cars">
-              <i className="fas fa-car mr-1"></i>Vehicles
-            </Link>
-          </li>
-          <li className="w-full font-bold text-3xl text-gray-200 flex items-center justify-center my-5 py-2 px-4 hover:bg-myRed hover:text-gray-200">
-            <Link to="/admin/sales">
-              <i className="fas fa-coins mr-1"></i>Sales
-            </Link>
-          </li>
-          <li className="w-full font-bold text-3xl text-gray-200 flex items-center justify-center my-5 py-2 px-4 hover:bg-myRed hover:text-gray-200">
-            <Link to="/admin/users">
-              <i className="fas fa-users mr-1"></i>Users
-            </Link>
-          </li>
+          <PrivateComponent roleList={["admin", "vendor", "inactive"]}>
+            <li className="w-full font-bold text-3xl text-gray-200 flex items-center justify-center my-5 py-2 px-4 hover:bg-myRed hover:text-gray-200">
+              <Link to="/admin">
+                <i className="fas fa-brain mr-1"></i>Master
+              </Link>
+            </li>
+          </PrivateComponent>
+          <PrivateComponent roleList={["admin", "vendor"]}>
+            <li className="w-full font-bold text-3xl text-gray-200 flex items-center justify-center my-5 py-2 px-4 hover:bg-myRed hover:text-gray-200">
+              <Link to="/admin/cars">
+                <i className="fas fa-car mr-1"></i>Vehicles
+              </Link>
+            </li>
+          </PrivateComponent>
+          <PrivateComponent roleList={["admin", "vendor"]}>
+            <li className="w-full font-bold text-3xl text-gray-200 flex items-center justify-center my-5 py-2 px-4 hover:bg-myRed hover:text-gray-200">
+              <Link to="/admin/sales">
+                <i className="fas fa-coins mr-1"></i>Sales
+              </Link>
+            </li>
+          </PrivateComponent>
+          <PrivateComponent roleList={["admin"]}>
+            <li className="w-full font-bold text-3xl text-gray-200 flex items-center justify-center my-5 py-2 px-4 hover:bg-myRed hover:text-gray-200">
+              <Link to="/admin/users">
+                <i className="fas fa-users mr-1"></i>Users
+              </Link>
+            </li>
+          </PrivateComponent>
           <li className="w-full text-xl text-gray-200 flex items-center justify-center mb-5 mt-10 py-2 px-4 font-bold hover:underline">
             <button onClick={() => signOut()}>Sign out</button>
           </li>
